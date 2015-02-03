@@ -1,0 +1,133 @@
+function printInventory(inputs){
+    var shopping_list = '***<没钱赚商店>购物清单***';
+    var transfer = add_item_to_transfer(inputs);
+    var new_inputs = [];
+    var free_shop_list = [];
+    var subtotle = 0;
+    var totle = 0;
+    var save_money = 0;
+    var free_shop_subtotle = 0;
+    var free_shop_totle = 0;
+    add_count_to_transfer(transfer,inputs);
+    push_transfer_to_new_inputs(transfer,new_inputs);
+    add_freeshop_to_free_shop_list(new_inputs,free_shop_list);
+    new_subtotle(new_inputs,subtotle,totle,free_shop_list,shopping_list,free_shop_subtotle,free_shop_totle);    
+}
+function add_item_to_transfer(inputs)
+{
+    var transfer = [];
+    var item = loadAllItems();
+    for(var i = 0; i < inputs.length; i ++)
+    {
+        compare_barcode(item,i,inputs,transfer);
+    }
+    return(transfer);
+}
+function compare_barcode(item,i,inputs,transfer)
+{
+    for(var j = 0; j < item.length; j ++)
+    {
+        if(inputs[i].substring(0,10) == item[j].barcode)
+        {
+            transfer.push(item[j]);
+        }
+    }
+}
+function add_count_to_transfer(transfer,inputs)
+{
+    for(var m = 0; m <transfer.length; m ++)
+    {
+        for(var n = 0; n < inputs.length; n ++)
+        {
+            compare_transfer_and_inputs_barcode(m,n,transfer,inputs);
+        }
+    }
+}
+function compare_transfer_and_inputs_barcode(m,n,transfer,inputs)
+{
+    if(transfer[m].barcode == inputs[n])
+    {
+        transfer[m].count = 1;
+    }
+    else if(transfer[m].barcode == inputs[n].substring(0,10))
+    {
+        transfer[m].count = inputs[n].substr(11);
+    }
+}
+function push_transfer_to_new_inputs(transfer,new_inputs)
+{
+    new_inputs.push(transfer[0]);
+    for(var p = 1; p < transfer.length; p ++)
+    {
+        compare_transfer_and_new_inputs_barcode(new_inputs,transfer,p);
+    }
+    return(new_inputs);
+}
+function compare_transfer_and_new_inputs_barcode(new_inputs,transfer,p)
+{
+    for(var q = 0; q < new_inputs.length; q ++ )
+    {
+        if(transfer[p].barcode == new_inputs[q].barcode)
+        {
+            new_inputs[q].count ++;
+        }
+        else if(transfer[p].barcode != new_inputs[q].barcode && q === new_inputs.length - 1)
+        {
+            new_inputs.push(transfer[p]);
+            break;
+        }
+    }
+}
+function add_freeshop_to_free_shop_list(new_inputs,free_shop_list)
+{
+    var new_item = loadPromotions();
+    for(var a = 0; a < new_inputs.length; a ++)
+    {
+        compare_barcode_in_new_inputs_and_new_item(new_item,new_inputs,a,free_shop_list);
+    }
+}
+function compare_barcode_in_new_inputs_and_new_item(new_item,new_inputs,a,free_shop_list)
+{
+    for(var b = 0; b < new_item[0].barcodes.length; b ++)
+    {
+        if(new_inputs[a].barcode == new_item[0].barcodes[b] && new_inputs[a].count > 2)
+        {
+            free_shop_list.push(new_inputs[a]);
+        }
+    } 
+}
+function new_subtotle(new_inputs,subtotle,totle,free_shop_list,shopping_list,free_shop_subtotle,free_shop_totle)
+{
+    for(var c = 0; c < new_inputs.length; c ++)
+    {
+        subtotle = new_inputs[c].count * new_inputs[c].price;
+        subtotle = comepare_barcode_in_new_inputs_and_free_shop_list(free_shop_list,new_inputs,c,subtotle);
+        totle += subtotle;
+        shopping_list = shopping_list + '\n' + '名称:' + new_inputs[c].name + ',数量:' + new_inputs[c].count + new_inputs[c].unit +',单价:' + new_inputs[c].price.toFixed(2) + '(元),小计:' + subtotle.toFixed(2) + '(元)';
+    }
+    output_shopping_list(free_shop_list,free_shop_subtotle,free_shop_totle,shopping_list,totle);
+}
+function comepare_barcode_in_new_inputs_and_free_shop_list(free_shop_list,new_inputs,c,subtotle)
+{
+    for(var d = 0; d < free_shop_list.length; d ++)
+    {
+        if(new_inputs[c].barcode == free_shop_list[d].barcode && new_inputs[c].count > 2)
+        {
+            subtotle = new_inputs[c].price * (new_inputs[c].count - parseInt(new_inputs[c].count / 3,0));
+        }
+    }  
+    return subtotle;
+}
+function output_shopping_list(free_shop_list,free_shop_subtotle,free_shop_totle,shopping_list,totle)
+{
+    shopping_list = shopping_list + '\n' + '----------------------' + '\n' + '挥泪赠送商品:';
+    for(var e = 0; e < free_shop_list.length; e ++)
+    {
+        free_shop_subtotle = free_shop_list[e].price * parseInt(free_shop_list[e].count / 3,0);
+        free_shop_totle += free_shop_subtotle;
+        shopping_list = shopping_list + '\n' + '名称:' + free_shop_list[e].name + ',数量:' + parseInt(free_shop_list[e].count / 3,0) + free_shop_list[e].unit;
+    }
+    shopping_list = shopping_list + '\n' + '----------------------' + '\n' +'总计:' +  totle.toFixed(2) + '(元)' + '\n' + '节省:' + free_shop_totle.toFixed(2) +'(元)' + '\n' + '**********************';   
+    console.log(shopping_list);
+    return(shopping_list);
+}

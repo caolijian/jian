@@ -1,0 +1,26 @@
+function showTime(output)
+{
+     var now=new Date();  
+    var year=now.getFullYear();//获取四位数年数  
+    var month=now.getMonth()+1;  
+    var date=now.getDate();  
+    var hours = now.getHours(); 
+    var minutes = now.getMinutes();  
+    var seconds = now.getSeconds(); 
+   output=output+'\n'+'打印时间:'+year + "年"+Appendzero(month) + "月" + Appendzero(date) + "日 "+Appendzero(hours)+':'+Appendzero(minutes)+':'+Appendzero(seconds) +'\n'+'----------------------'; 
+console.log(output); return output;
+}
+function compareBar(j,tidyList,tidyList0)
+{
+    var old_item = _.find(tidyList,function(item){
+        return item.barcode == tidyList0[j].barcode;});
+    if(old_item !== undefined) 
+        old_item.count ++;
+    var old_item1 = _.find(tidyList,function(item){
+        return item.barcode == tidyList0[j].barcode;});
+    if(old_item1 === undefined)
+    {
+          tidyList.push(tidyList0[j]);
+            tidyList[tidyList.length-1].count=1;
+    }
+

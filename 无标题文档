@@ -1,0 +1,20 @@
+   /*for(var a = 0;a < inputs.length; a ++)
+    {
+        for(var b = 0; b < new_array.length; b ++)
+        {
+            if(inputs[a].length > 10 && new_array[b].barcode == inputs[a].substring(0,10))
+            {
+                new_array[b].count = inputs[a].substr(11);
+            }       
+        }
+    }*/
+    //console.log(new_array[1].count);
+    for(var c = 0; c < new_array.length; c ++)
+    {
+        var arrays = _.find(inputs,function(input)
+        {
+            return input.length > 10 && new_array[c].barcode == input.substring(0,10);
+        });
+        new_array[c].count = inputs.substr(11);
+    }
+    console.log(new_array[1].count);
